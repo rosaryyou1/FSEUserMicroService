@@ -9,52 +9,63 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cognizant.aws.fse.userservice.Json.Domain.Skill;
+import com.cognizant.aws.fse.userservice.Json.domain.Skill;
+import com.cognizant.aws.fse.userservice.Json.domain.UserJsonModel;
 import com.cognizant.aws.fse.userservice.model.User;
+import com.cognizant.aws.fse.userservice.service.CognitoAuthService;
 import com.cognizant.aws.fse.userservice.service.UserService;
+import com.cognizant.aws.fse.userservice.util.ValidationException;
+
+import net.spy.memcached.MemcachedClient;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/skill-tracker/api/v1/engineer")
 public class UserServiceController {
 
-@Autowired
-UserService userService;
+	@Autowired
+	UserService userService;
 
-@GetMapping("/users")
-public List<User> getUsers(){
-	return userService.getUsers();
-}
+	//@Autowired
+	MemcachedClient memcachedClient;
 
-@GetMapping("/users/{id}")
-public User getUser(@PathVariable String id) {
-	User user =  userService.getUserByUserId(id);
-	return user;
+	@Autowired
+	CognitoAuthService authService;
 
-}
+	@GetMapping("/users/{id}")
+	public User getUser(@PathVariable String id) {
+		User user =  userService.getUserByUserId(id);
+		return user;
 
-@PostMapping(path="/saveusers",consumes = MediaType.APPLICATION_JSON_VALUE)
-public User getUser(@RequestBody User user) {
-	System.out.println(user);
-	userService.saveUser(user);
-	return user;
+	}
 
-}
+	@PostMapping(path="/add-profile",consumes = MediaType.APPLICATION_JSON_VALUE)
+	public String addUser(@RequestBody UserJsonModel userModel) {
+		String status = "{ status : success}";
+		try {
+			userService.saveUser(userModel);
+		} catch (Exception e) {
+			status = e.getMessage();
+		}
+		return status;
 
-@GetMapping("/users/{criteria}/{criteriavalue}")
-public List<User> getUser(@PathVariable String criteria,@PathVariable String criteriavalue) {
-	System.out.println(criteriavalue);
-	List<User> users =  userService.findByNameAndAssociateIdAndSkill(criteria,criteriavalue);
-	return users;
+	}
 
-}
+	@PutMapping(path="/update-profile/{userId}",consumes = MediaType.APPLICATION_JSON_VALUE)
+	public String updateUser(@PathVariable String userId,@RequestBody List<Skill> lstSkill
+			,@RequestHeader(name = "userName") String userName,@RequestHeader(name="password") String password) {
+		String status = "{ status : success}";
+		try {
+			authService.authenticateUser(userName,password);
+			userService.updateUser(userId,lstSkill);
+		} catch (Exception e) {
+			status = e.getMessage();
+		}
+		return status;
+	}
 
-@PutMapping(path="/updateusers/{userId}",consumes = MediaType.APPLICATION_JSON_VALUE)
-public User updateUser(@PathVariable String userId,@RequestBody List<Skill> lstSkill) {
-	User user =  userService.updateUser(userId,lstSkill);
-	return user;
-}
 
 }

@@ -1,9 +1,15 @@
-package com.cognizant.aws.fse.userservice.Json.Domain;
+package com.cognizant.aws.fse.userservice.Json.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown =  true)
 public class Skill {
-	
+	@JsonProperty("Skill")
 	String skillName;
+	@JsonProperty("Type")
 	String skillType;
+	@JsonProperty("Level")
 	int skillLevel;
 	
 	public String getSkillName() {
