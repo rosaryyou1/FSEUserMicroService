@@ -2,6 +2,8 @@ package com.cognizant.aws.fse.userservice.controller;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,20 +37,29 @@ public class UserServiceController {
 	@Autowired
 	CognitoAuthService authService;
 
+	Logger logger = LogManager.getLogger(UserServiceController.class);
+
+
 	@GetMapping("/users/{id}")
 	public User getUser(@PathVariable String id) {
+		logger.info("Service getUser - start :"+id);
 		User user =  userService.getUserByUserId(id);
+		logger.info("Service getUser - success :"+id);
 		return user;
 
 	}
 
 	@PostMapping(path="/add-profile",consumes = MediaType.APPLICATION_JSON_VALUE)
 	public String addUser(@RequestBody UserJsonModel userModel) {
+		logger.info("Service Add profile - start :"+userModel.getAssociateName());
 		String status = "{ status : success}";
 		try {
 			userService.saveUser(userModel);
+			logger.info("Service Add profile - success :"+userModel.getAssociateName());
 		} catch (Exception e) {
+			logger.error("Service Add profile - failed :"+userModel.getAssociateName());
 			status = e.getMessage();
+			logger.error(status);			
 		}
 		return status;
 
@@ -57,12 +68,16 @@ public class UserServiceController {
 	@PutMapping(path="/update-profile/{userId}",consumes = MediaType.APPLICATION_JSON_VALUE)
 	public String updateUser(@PathVariable String userId,@RequestBody List<Skill> lstSkill
 			,@RequestHeader(name = "userName") String userName,@RequestHeader(name="password") String password) {
+		logger.info("Service update profile - start :"+userId+":updated by:"+userName);
 		String status = "{ status : success}";
 		try {
 			authService.authenticateUser(userName,password);
 			userService.updateUser(userId,lstSkill);
+			logger.info("Service update profile - success :"+userId+":updated by:"+userName);
 		} catch (Exception e) {
+			logger.info("Service update profile - failed :"+userId+":updated by:"+userName);
 			status = e.getMessage();
+			logger.error(status);
 		}
 		return status;
 	}

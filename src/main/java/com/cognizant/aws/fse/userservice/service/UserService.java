@@ -1,7 +1,6 @@
 package com.cognizant.aws.fse.userservice.service;
 
 import java.time.LocalDate;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,19 +15,14 @@ import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.jms.pool.PooledConnectionFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
-import com.amazonaws.services.dynamodbv2.document.Index;
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.ItemCollection;
-import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
-import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
-import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.cognizant.aws.fse.userservice.Json.domain.Skill;
 import com.cognizant.aws.fse.userservice.Json.domain.UserJsonModel;
 import com.cognizant.aws.fse.userservice.model.User;
@@ -61,6 +55,7 @@ public class UserService {
 	@Autowired
 	DynamoDBMapper dynamoDBmapper;
 	
+	Logger logger = LogManager.getLogger(UserService.class);
 	
 	public User getUserByUserId(String userId) {
 		User user = feignClnt.getUserByUserId(userId);
@@ -69,13 +64,16 @@ public class UserService {
 
 	@JmsListener(destination = "${consumer.queues}")
 	public void  receiveMessage(TextMessage message) throws JMSException, JsonMappingException, JsonProcessingException {
+		logger.debug("method receiveMessage - start :"+message.getText());
 		String srvEndpoint = usrProfileProcessorSrvLoc.resolve();
 		ObjectMapper obj = new ObjectMapper();
 		UserJsonModel userJsonModel= obj.readValue(message.getText(),UserJsonModel.class);
 		feignClnt.saveUser(userJsonModel);
+		logger.debug("method receiveMessage - start :"+message.getText());
 	}
 
 	public void publishUser(UserJsonModel userModel) throws JMSException, JsonProcessingException {
+		logger.debug("method publishUser - start :"+userModel.getAssociateName());
 		Connection producerConnection = pooledActiveMQConnectionFactory.createConnection();
 		producerConnection.start();
 		final Session producerSession = producerConnection
@@ -94,17 +92,21 @@ public class UserService {
 		producer.close();
 		producerSession.close();
 		producerConnection.close();
+		logger.debug("method publishUser - end :"+userModel.getAssociateName());
 	}
 
 	public void saveUser(UserJsonModel userModel) throws ValidationException, JsonProcessingException, JMSException {
+		logger.debug("method saveUser - start :"+userModel.getAssociateName());
 		List<ValidationError> lstError = ValidationUtil.validateUser(userModel);
 		if(lstError.size()>0) {
 			ValidationUtil.constructError(lstError);
 		}
 		this.publishUser(userModel);
+		logger.debug("method saveUser - end :"+userModel.getAssociateName());
 	}
 
 	public String updateUser(String userId, List<Skill> lstSkills) throws ValidationException {
+		logger.debug("method updateUser - start :"+userId);
 		List<ValidationError> lstError = ValidationUtil.validateOnlySkills(lstSkills);
 		User user = this.getUserByUserId(userId);
 		if(userId==null || user==null || user.getUserId()==null) {
@@ -123,6 +125,7 @@ public class UserService {
 		UserModelJsonConverter.mapSkills(user,mapSkills);
 		user.setLstUptTs(LocalDate.now().toString());
 		String status = this.callUpdateUserMethod(user);
+		logger.debug("method updateUser - end :"+status);
 		return status;
 	}
 	

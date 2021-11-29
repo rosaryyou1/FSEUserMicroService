@@ -1,6 +1,5 @@
 package com.cognizant.aws.fse.userservice.service;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,6 @@ import com.amazonaws.services.cognitoidp.model.InitiateAuthRequest;
 import com.amazonaws.services.cognitoidp.model.InitiateAuthResult;
 import com.cognizant.aws.fse.userservice.util.ValidationError;
 import com.cognizant.aws.fse.userservice.util.ValidationUtil;
-import com.google.common.hash.Hashing;
 
 
 @Service

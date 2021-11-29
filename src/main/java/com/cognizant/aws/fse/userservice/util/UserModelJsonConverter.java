@@ -1,6 +1,6 @@
 package com.cognizant.aws.fse.userservice.util;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -16,6 +16,7 @@ public class UserModelJsonConverter {
 		user.setAssociateName(userJson.getAssociateName());
 		user.setEmail(userJson.getEmail());
 		user.setMobile(userJson.getMobile());
+		user.setCre8Ts(LocalDate.now().toString());
 		List<Skill> lstSkill = userJson.getSkills();
 		for(Skill skill : lstSkill) {
 			if("Angular".equalsIgnoreCase(skill.getSkillName())){

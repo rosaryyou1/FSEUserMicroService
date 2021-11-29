@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.cognizant</groupId>
 	<artifactId>FSEUserMicroService</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<name>FSEUserMicroService</name>
 	<description>FSEUserMicroService</description>
 	<properties>
@@ -28,8 +28,17 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -123,12 +132,6 @@
 			<version>4.8.2</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>31.0.1-jre</version>
-		</dependency>
-
 	</dependencies>
 	<build>
 		<plugins>
@@ -151,7 +154,7 @@
 				</executions>
 
 				<configuration>
-					<repository>${docker.image.prefix}/usermicroserviceimage</repository>
+					<repository>${docker.image.prefix}/fseusermicroserviceimage</repository>
 					<tag>${project.version}</tag>
 					<buildArgs>
 						<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>

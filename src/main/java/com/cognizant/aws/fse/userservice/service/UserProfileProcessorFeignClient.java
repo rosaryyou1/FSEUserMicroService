@@ -14,12 +14,12 @@ import com.cognizant.aws.fse.userservice.model.User;
 @FeignClient(name="fseprofileprocesssrv",
 url="http://FSEFargateAlb-1289736730.us-east-2.elb.amazonaws.com:8080",fallback = UserProfileProcCircuitBrk.class)
 public interface UserProfileProcessorFeignClient {
-	@PostMapping(value="/skill-tracker/api/v1/engineer/save-profile",consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value="/internal/skill-tracker/api/v1/engineer/save-profile",consumes = MediaType.APPLICATION_JSON_VALUE)
 	public String saveUser(@RequestBody UserJsonModel usermodel);
 	
-	@PutMapping(value="/skill-tracker/api/v1/engineer/update-profile",consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value="/internal/skill-tracker/api/v1/engineer/update-profile",consumes = MediaType.APPLICATION_JSON_VALUE)
 	public String updateUser(@RequestBody User use);
 	
-	@GetMapping(value="/skill-tracker/api/v1/engineer/users/{userId}")
+	@GetMapping(value="/internal/skill-tracker/api/v1/engineer/users/{userId}")
 	public User getUserByUserId(@PathVariable String userId); 
 }
