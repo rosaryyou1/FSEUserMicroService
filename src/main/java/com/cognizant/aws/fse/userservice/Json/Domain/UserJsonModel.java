@@ -18,18 +18,28 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+@ApiModel(description = "User Json")
 @JsonIgnoreProperties(ignoreUnknown =  true)
 public class UserJsonModel {
+	@ApiModelProperty(notes = "User Id",name="UserId",required=false,value="12123213213213213")
 	@JsonProperty("UserId")
 	String userId;
+	@ApiModelProperty(notes = "AssociateName must be more than 5 char",name="AssociateName",required=true,value="AssociateName must be more than 5 char ")
 	@JsonProperty("AssociateName")
 	String associateName;
+	@ApiModelProperty(notes = "AssociateId must be more than 5 char and starts with CTS",name="AssociateId",required=true,value="AssociateId must be more than 5 char and starts with CTS")
 	@JsonProperty("AssociateId")
 	String associateId;
+	@ApiModelProperty(notes = "Mobile Number 10 digits",name="Mobile",required=true,value="Mobile Number 10 digits")
 	@JsonProperty("Mobile")
 	String mobile;
+	@ApiModelProperty(notes = "Should follow Email format",name="Email",required=true,value="Should follow Email format")
 	@JsonProperty("Email")
 	String email;
+	@ApiModelProperty(notes = "Skills list values",name="Skills",required=true,value="{Angular,AWS,Spoken}")
 	@JsonProperty("Skills")
 	List<Skill> skills;
  

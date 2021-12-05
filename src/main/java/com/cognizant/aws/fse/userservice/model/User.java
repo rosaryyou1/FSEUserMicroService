@@ -8,13 +8,21 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(description = "User Json")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @DynamoDBTable(tableName = "FSEProfile")
 public class User {
+	@ApiModelProperty(notes = "User Id",name="UserId",required=false,value="12123213213213213")
 	@JsonProperty("UserId")
 	String userId;
+	@ApiModelProperty(notes = "Mobile",name="Mobile",required=true,value="123456789")
 	@JsonProperty("Mobile")
 	String mobile;
+	@ApiModelProperty(notes = "Email",name="Email",required=true,value="test@gmail.com")
 	@JsonProperty("Email")
 	String email;
 	@JsonProperty("Angular")

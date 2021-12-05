@@ -1,0 +1,26 @@
+version: 0.1
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - docker login --username AWS -p $(aws ecr get-login-password --region us-east-2 ) 751590300681.dkr.ecr.us-east-2.amazonaws.com/fse/usermicroserviceimage
+      - REPOSITORY_URI=751590300681.dkr.ecr.us-east-2.amazonaws.com/fse/usermicroserviceimage
+      #- COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=latest
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - mvn clean verify
+      - docker tag fse/usermicroserviceimage:0.0.2 751590300681.dkr.ecr.us-east-2.amazonaws.com/fse/usermicroserviceimage:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:latest
+      - echo Writing image definitions file...
+      #- printf '[{"name":"hello-world","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+#artifacts:
+  #  files: imagedefinitions.json

@@ -22,10 +22,18 @@ import com.cognizant.aws.fse.userservice.service.CognitoAuthService;
 import com.cognizant.aws.fse.userservice.service.UserService;
 import com.cognizant.aws.fse.userservice.util.ValidationException;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import net.spy.memcached.MemcachedClient;
 
+@Api(value = "UserServiceController", description = "User service to handle the add and update")
 @RestController
 @RequestMapping("/skill-tracker/api/v1/engineer")
+/**
+ * User service to handle the add and update
+ * @author anton
+ *
+ */
 public class UserServiceController {
 
 	@Autowired
@@ -40,6 +48,12 @@ public class UserServiceController {
 	Logger logger = LogManager.getLogger(UserServiceController.class);
 
 
+	/**
+	 * Get the user based on Id to do the update (Utility)
+	 * @param id
+	 * @return
+	 */
+	@ApiOperation(value = "Get the user based on Id to do the update (Utility)", response = User.class, tags = "getUser")
 	@GetMapping("/users/{id}")
 	public User getUser(@PathVariable String id) {
 		logger.info("Service getUser - start :"+id);
@@ -49,6 +63,12 @@ public class UserServiceController {
 
 	}
 
+	/**
+	 * Add method based on the user json
+	 * @param userModel
+	 * @return
+	 */
+	@ApiOperation(value = "Add method based on the user json", response = String.class, tags = "addUser")
 	@PostMapping(path="/add-profile",consumes = MediaType.APPLICATION_JSON_VALUE)
 	public String addUser(@RequestBody UserJsonModel userModel) {
 		logger.info("Service Add profile - start :"+userModel.getAssociateName());
@@ -65,6 +85,15 @@ public class UserServiceController {
 
 	}
 
+	/**
+	 * Update the given users skills. Auth done based on cognito username /pass
+	 * @param userId
+	 * @param lstSkill
+	 * @param userName
+	 * @param password
+	 * @return
+	 */
+	@ApiOperation(value = "Update the given users skills. Auth done based on cognito username /pass", response = String.class, tags = "updateUser")
 	@PutMapping(path="/update-profile/{userId}",consumes = MediaType.APPLICATION_JSON_VALUE)
 	public String updateUser(@PathVariable String userId,@RequestBody List<Skill> lstSkill
 			,@RequestHeader(name = "userName") String userName,@RequestHeader(name="password") String password) {
